@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+    container_name: php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - postgres
+      - mongodb
+
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+      POSTGRES_DB: symfony
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  postgres_data:
+  mongo_data:

@@ -1,0 +1,147 @@
+# Attention - Les tables : energies, role, marque, statut_cov statut_avis sont en place ici pour remplacer des ENUM qui ne sont pas supporter dans looping, il faut faire les changement dans le script avant de générer les tabes#
+
+Sub Create_Tables()
+
+DoCmd.RunSQL "CREATE TABLE Utilisateur(" & _
+   "Id_Utilisateur COUNTER," & _
+   "nom VARCHAR(50) NOT NULL," & _
+   "prenom VARCHAR(50) NOT NULL," & _
+   "email VARCHAR(100) NOT NULL," & _
+   "password VARCHAR(255) NOT NULL," & _
+   "date_naissance DATE NOT NULL," & _
+   "photo_url VARCHAR(255)," & _
+   "pseudo VARCHAR(50) NOT NULL," & _
+   "credit VARCHAR(50) NOT NULL," & _
+   "PRIMARY KEY(Id_Utilisateur)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE Adresse(" & _
+   "Id_Adresse COUNTER," & _
+   "rue VARCHAR(100)," & _
+   "ville VARCHAR(50)," & _
+   "code_postal VARCHAR(10)," & _
+   "pays VARCHAR(50)," & _
+   "PRIMARY KEY(Id_Adresse)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE energie(" & _
+   "Id_energie COUNTER," & _
+   "libelle_energie VARCHAR(50) NOT NULL," & _
+   "PRIMARY KEY(Id_energie)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE statut_cov(" & _
+   "Id_statut_cov COUNTER," & _
+   "libelle_statut_cov VARCHAR(50) NOT NULL," & _
+   "PRIMARY KEY(Id_statut_cov)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE statut_avis(" & _
+   "Id_statut_avis COUNTER," & _
+   "libelle_statut_avis VARCHAR(50) NOT NULL," & _
+   "PRIMARY KEY(Id_statut_avis)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE marque(" & _
+   "Id_marque COUNTER," & _
+   "libelle_marque VARCHAR(50) NOT NULL," & _
+   "PRIMARY KEY(Id_marque)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE role(" & _
+   "Id_role COUNTER," & _
+   "libelle_role VARCHAR(50) NOT NULL," & _
+   "PRIMARY KEY(Id_role)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE Configuration(" & _
+   "Id_Configuration COUNTER," & _
+   "Id_Utilisateur INT NOT NULL," & _
+   "PRIMARY KEY(Id_Configuration)," & _
+   "FOREIGN KEY(Id_Utilisateur) REFERENCES Utilisateur(Id_Utilisateur)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE voiture(" & _
+   "Id_voiture COUNTER," & _
+   "modele VARCHAR(50) NOT NULL," & _
+   "immatriculation VARCHAR(9) NOT NULL," & _
+   "couleur VARCHAR(50) NOT NULL," & _
+   "date_premiere_immatriculation DATE NOT NULL," & _
+   "Id_marque INT NOT NULL," & _
+   "Id_energie INT NOT NULL," & _
+   "PRIMARY KEY(Id_voiture)," & _
+   "UNIQUE(immatriculation)," & _
+   "FOREIGN KEY(Id_marque) REFERENCES marque(Id_marque)," & _
+   "FOREIGN KEY(Id_energie) REFERENCES energie(Id_energie)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE covoiturage(" & _
+   "Id_covoiturage COUNTER," & _
+   "date_depart DATE NOT NULL," & _
+   "heure_depart TIME NOT NULL," & _
+   "lieu_depart VARCHAR(100) NOT NULL," & _
+   "lieu_arrivee VARCHAR(100) NOT NULL," & _
+   "prix_par_personne DECIMAL(10,2) NOT NULL," & _
+   "nb_places INT NOT NULL," & _
+   "Id_voiture INT NOT NULL," & _
+   "Id_statut_cov INT NOT NULL," & _
+   "PRIMARY KEY(Id_covoiturage)," & _
+   "FOREIGN KEY(Id_voiture) REFERENCES voiture(Id_voiture)," & _
+   "FOREIGN KEY(Id_statut_cov) REFERENCES statut_cov(Id_statut_cov)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE Avis(" & _
+   "Id_Avis COUNTER," & _
+   "commentaire TEXT," & _
+   "note INT," & _
+   "Id_covoiturage INT NOT NULL," & _
+   "Id_Utilisateur INT NOT NULL," & _
+   "Id_statut_avis INT NOT NULL," & _
+   "PRIMARY KEY(Id_Avis)," & _
+   "FOREIGN KEY(Id_covoiturage) REFERENCES covoiturage(Id_covoiturage)," & _
+   "FOREIGN KEY(Id_Utilisateur) REFERENCES Utilisateur(Id_Utilisateur)," & _
+   "FOREIGN KEY(Id_statut_avis) REFERENCES statut_avis(Id_statut_avis)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE parametre(" & _
+   "Id_parametre COUNTER," & _
+   "propriete VARCHAR(50) NOT NULL," & _
+   "valeur VARCHAR(50) NOT NULL," & _
+   "Id_Configuration INT NOT NULL," & _
+   "PRIMARY KEY(Id_parametre)," & _
+   "FOREIGN KEY(Id_Configuration) REFERENCES Configuration(Id_Configuration)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE Réside(" & _
+   "Id_Utilisateur INT," & _
+   "Id_Adresse INT," & _
+   "PRIMARY KEY(Id_Utilisateur, Id_Adresse)," & _
+   "FOREIGN KEY(Id_Utilisateur) REFERENCES Utilisateur(Id_Utilisateur)," & _
+   "FOREIGN KEY(Id_Adresse) REFERENCES Adresse(Id_Adresse)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE participe(" & _
+   "Id_Utilisateur INT," & _
+   "Id_covoiturage INT," & _
+   "PRIMARY KEY(Id_Utilisateur, Id_covoiturage)," & _
+   "FOREIGN KEY(Id_Utilisateur) REFERENCES Utilisateur(Id_Utilisateur)," & _
+   "FOREIGN KEY(Id_covoiturage) REFERENCES covoiturage(Id_covoiturage)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE possede(" & _
+   "Id_Utilisateur INT," & _
+   "Id_role INT," & _
+   "PRIMARY KEY(Id_Utilisateur, Id_role)," & _
+   "FOREIGN KEY(Id_Utilisateur) REFERENCES Utilisateur(Id_Utilisateur)," & _
+   "FOREIGN KEY(Id_role) REFERENCES role(Id_role)" & _
+");"   
+
+DoCmd.RunSQL "CREATE TABLE gere(" & _
+   "Id_Utilisateur INT," & _
+   "Id_voiture INT," & _
+   "PRIMARY KEY(Id_Utilisateur, Id_voiture)," & _
+   "FOREIGN KEY(Id_Utilisateur) REFERENCES Utilisateur(Id_Utilisateur)," & _
+   "FOREIGN KEY(Id_voiture) REFERENCES voiture(Id_voiture)" & _
+");"   
+
+End Sub
